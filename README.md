@@ -1,1 +1,2 @@
 # DynamicEntity
+Companion for ActionStrategy
