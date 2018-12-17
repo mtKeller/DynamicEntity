@@ -1,0 +1,1 @@
+import { DynamicEntity } from './src/DynamicEntity.class';
