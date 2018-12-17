@@ -1,0 +1,32 @@
+{
+  "name": "dynamicentity",
+  "version": "0.5.0",
+  "description": "Entity Object Pattern, which utilizes key value numeric pairs with associated data. In addition may outright filter delete stored data rather than leaving gaps.",
+  "main": "dist/index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mtKeller/DynamicEntity.git"
+  },
+  "keywords": [
+    "ngrx",
+    "action",
+    "redux",
+    "typescript",
+    "entity",
+    "pattern",
+    "list",
+    "array",
+    "dynamic",
+    "actionstrategy",
+    "dynamicentity"
+  ],
+  "author": "Micah T. Keller",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mtKeller/DynamicEntity/issues"
+  },
+  "homepage": "https://github.com/mtKeller/DynamicEntity#readme"
+}

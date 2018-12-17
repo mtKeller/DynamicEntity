@@ -1,2 +1,2 @@
 # DynamicEntity
-Companion for ActionStrategy
+Next up is the read me and packing for NPM
