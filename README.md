@@ -137,14 +137,12 @@ Nothing fancy, but facilitates ease of rendering large objects in frontend in ad
 DynamicEntity is designed to be functionally similar to Arrays as possible. Thus DynamicEntity has the following functions:
 
 * `Common Functions:`
-
 ** map()
 ** filter()
 ** entries()
 **values()
 
 * `Unique Functions`
-
 ** append()
 ** dehydrate()
 ** borrow()
