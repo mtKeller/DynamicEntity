@@ -1,8 +1,9 @@
 # DynamicEntity
 
-Designed to be a companion object to be used in conjunction with [ActionStrategy](https://www.npmjs.com/package/actionstrategy) or plain [NgRx](https://ngrx.io). DynamicEntity is a Control Data Structure that optimizes the use of index pointers in Javascript.
+Designed to be a companion object to be used in conjunction with [ActionStrategy](https://www.npmjs.com/package/actionstrategy) or plain [NgRx](https://ngrx.io). DynamicEntity is a Control Data Structure that enables the use of Indexes as **address pointers** in Javascript.
 
-By example what this structure accomplishes
+##By Example
+
 ```javascript
 import { DynamicEntity } from 'dynamicentity'
 
@@ -51,6 +52,8 @@ console.log("Outputs: ", demoEntity);
 */
 ```
 
-This is to unfortunately contrast against NgRx's own Entity approach. As what this accomplish is a pure implementation of the "Entity" Pattern. As such is just an object with key value pairs.
-In this implementation a DynamicEntity is designed to be part of state, and not to replace reducers with an extra layer of abstraction to avoid boilerplate.
-With the reliance on a simple iterative index between entries is to reinforce that what this pattern enables is an abstract means of creating an address pointer in a traditional low level language. By keeping the implementation simple and Array like, it is to emphasize the use of Array of Index Structures to control logic flow. Via the removal of entries, any use of the pointer will throw an error similar to null point.
+This is to unfortunately contrast against NgRx's own Entity approach. As what this accomplish is a pure implementation of the "Entity" Pattern. As such is just an object that maintains a set of properties that are key value pairs.
+
+In this implementation a DynamicEntity is designed to be part of slice of state and point to another slice. Not to replace reducer's functionalism with an extra layer of abstraction to avoid boilerplate.
+
+With the reliance on a simple iterative Index Key, is to reinforce that what this pattern enables in Node. An abstract means of creating an address pointer that is comparable to a traditional low level language's implementation. By keeping the implementation simple and Array like, it is to emphasize the use of **"Array of Index Structures"** to control logic flow. Via the removal or borrowing (*Rust like ownership*) of entries.
