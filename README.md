@@ -1,6 +1,6 @@
 # DynamicEntity
 
-Designed to be a companion object to be used in conjunction with [ActionStrategy](https://www.npmjs.com/package/actionstrategy) or plain [NgRx](https://ngrx.io). DynamicEntity is a Control Data Structure that enables the use of Indexes as **address pointers** in Javascript.
+Designed to be a companion object to be used in conjunction with [ActionStrategy](https://www.npmjs.com/package/actionstrategy) or plain [NgRx](https://ngrx.io). DynamicEntity is a Control Data Structure that facilatates the use of Indexes as **address pointers** in Javascript.
 
 ##By Example
 
