@@ -1,4 +1,9 @@
 /**
+* An Entity is an object that has any number of Key Value Pairs: ` number : value ` 
+*/
+export interface DynamicProperties { };
+
+/**
  * @license
  * Micah T. Keller. All Rights Reserved.
  *
@@ -6,17 +11,15 @@
  * found in the LICENSE file at https://github.com/mtKeller/DynamicEntity
  */
 
-export interface DynamicProperties { };
-
 /**
  * Constructs a `Dynamic Entity` which stores properties in iterable and numerable key value pairs.
  * 
  * * `Note:` When storing this object `YOU MUST DEHYDRATE IT`
  * * And likewise may rehydrate a dehydrated DynamicEntity through it's constructor
  * 
- * * `Common Functions:` append, map, filter, entries, keys, values.
+ * * `Common Functions:` append(), map(), filter(), entries(), keys(), values().
  * 
- * * `Unique Functions` dehydrate
+ * * `Unique Functions` dehydrate(), borrow(), return()
  * 
  * @param list -Optional: generate a Dynamic Entity from a list
  * @param rehydrate -Optional & Override to list param: rehydrate a dehydrated DynamicEntity
@@ -54,36 +57,80 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
 
 
   /**
-  * Unique Function `Dehydrate`
-  * 
-  * * Returns an Array container of [keyValueIndex, Value]
-  * * `Note` Stores the next appendable index as [-1, nextAvailableIndex] at the end of the array.
-  */
-  public dehydrate(): Array<Array<(number & any)>> {
+   * Unique Function `Dehydrate`
+   * 
+   * * Returns an Array container of `[ number, any ]`
+   * @param storeLastIndex - If set to false the dehydrated object will lose the `lastIndex` property for rehydration.
+   *  * Otherwise stores the last index as `[ -1, number ]` at the end of the returned array.
+   */
+  public dehydrate(storeLastIndex: boolean = true): Array<Array<(number & any)>> {
     const dehydrationArr = [];
     for (let props of this) {
       dehydrationArr.push([props, this[Number(props)]]);
     }
-    dehydrationArr.push([-1, this.lastIndex]);
+    if (storeLastIndex) {
+      dehydrationArr.push([-1, this.lastIndex]);
+    }
     return dehydrationArr;
   }
-
-  public borrow(): Array<(DynamicEntity & any)> {
-    return null;
+  /**
+   * Unique Function `Dehydrate`
+   * 
+   * * Select a property to be removed and returned in conjunction with the filtered Entity
+   * 
+   * @param selectFunc - Must return true to match the property to be borrowed
+   * @returns Array: `[ DynamicEntity, [ number, any ] ]` for deconstruction
+   */
+  public borrow(selectFunc: Function): Array<(DynamicEntity & any)> {
+    let borrowed;
+    const dehydrated = this.dehydrate();
+    const newArr = [];
+    for (let i = 0; i < dehydrated.length; i++) {
+      if (dehydrated[i][0] !== -1) {
+        if (selectFunc(dehydrated[i][1])) {
+          borrowed = dehydrated[i];
+        } else {
+          newArr.push(dehydrated[i]);
+        }
+      } else {
+        newArr.push(dehydrated[i]);
+      }
+    }
+    borrowed = [ Number(borrowed[0]), borrowed[1] ];
+    return [ new DynamicEntity(null, newArr), borrowed ];
   }
-
-  public return(): DynamicEntity {
-    return null;
+  /**
+   * Unique Function `Return`
+   * 
+   * * Adds a property into a new DynamicEntity with it's keys sorted high to low.
+   * 
+   * @param returned - Key value pair array `[ number, any ]` that is inserted into a new Entity
+   * @returns The new DynamicEntity
+   */
+  public return(returned: Array<(number & any)>): DynamicEntity {
+    let dehydrated = this.dehydrate();
+    dehydrated.push(returned);
+    dehydrated = dehydrated.sort((a, b) => {
+      if ( a[0] < b[0] ) {
+        return -1;
+      }
+      if ( a[0] > b[0] ) {
+        return 1;
+      }
+      return 0;
+    });
+    return new DynamicEntity(null, dehydrated);
   }
 
   /**
-  * Common Function `Append`
-  * 
-  * * `NOTE` Returns a `*new*` DynamicEntity object with the new value added at the end
-  * * This is to maintain functional dereferencing of objects
-  * 
-  * @param value -Required: Function each value is passed through
-  */
+   * Common Function `Append`
+   * 
+   * * `NOTE` Returns a `*new*` DynamicEntity object with the new value added at the end
+   * * This is to maintain functional dereferencing of objects
+   * 
+   * @param value -Required: Function each value is passed through
+   * @returns The new DynamicEntity
+   */
   public append(value: any): DynamicEntity {
     this.lastIndex++;
     this[this.lastIndex] = value;
@@ -91,12 +138,13 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
     return new DynamicEntity(null, dehydrated);
   }
   /**
-  * Common Function `Map`
-  * 
-  * * Returns a new DynamicEntity object with each value mutated by the passed function
-  * 
-  * @param mapFunc -Required: Function each value is passed through
-  */
+   * Common Function `Map`
+   * 
+   * * Returns a new DynamicEntity object with each value mutated by the passed function
+   * 
+   * @param mapFunc -Required: Function each value is passed through
+   * @returns The new DynamicEntity
+   */
   public map(mapFunc: Function): DynamicEntity {
     const dehydrated = this.dehydrate();
     for (let i = 0; i < dehydrated.length; i++) {
@@ -107,12 +155,13 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
     return new DynamicEntity(null, dehydrated);
   }
   /**
-  * Common Function `Filter`
-  * 
-  * * Returns a new DynamicEntity object that omits key values that do not pass the filterFunc
-  * 
-  * @param filterFunc -Required: Function each value is passed through
-  */
+   * Common Function `Filter`
+   * 
+   * * Returns a new DynamicEntity object that omits key values that do not pass the filterFunc
+   * 
+   * @param filterFunc -Required: Function each value is passed through
+   * @returns The new DynamicEntity
+   */
   public filter(filterFunc: Function): DynamicEntity {
     const dehydrated = this.dehydrate();
     const newArr = [];
@@ -128,11 +177,11 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
     return new DynamicEntity(null, newArr);
   }
   /**
-  * Common Function `Entries`
-  * 
-  * * Returns a `Iterator` Object that contains each key value pair
-  * 
-  */
+   * Common Function `Entries`
+   * 
+   *@returns An `Iterator` Object that contains each key value pair
+   * 
+   */
   public entries(): Iterator<DynamicProperties> {
     let pointer = 0;
     const keys = Object.keys(this);
@@ -155,11 +204,11 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
     };
   }
   /**
-  * Common Function `Entries`
-  * 
-  * * Returns a `Iterator` Object that contains individual value 
-  * 
-  */
+   * Common Function `Values`
+   * 
+   * @returns An`Iterator` Object that contains the value of properties
+   * 
+   */
   public values(): Iterator<DynamicProperties> {
     let pointer = 0;
     const keys = Object.keys(this);
@@ -191,7 +240,6 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
   [Symbol.iterator](): Iterator<DynamicProperties> {
     let pointer = 0;
     const keys = Object.keys(this);
-    const entity = this;
 
     return {
       next(): IteratorResult<DynamicProperties> {
