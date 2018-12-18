@@ -132,4 +132,22 @@ const pointerStoreWithChildren = [
 
 Nothing fancy, but facilitates ease of rendering large objects in frontend in addition to allowing for **priority** sorting. Or simply streamline computation in the back.
 
+## Closing
+
+DynamicEntity is designed to be functionally similar to Arrays as possible. Thus DynamicEntity has the following functions:
+
+* `Common Functions:`
+
+** map()
+** filter()
+** entries()
+**values()
+
+* `Unique Functions`
+
+** append()
+** dehydrate()
+** borrow()
+**return()
+
 CI tests to come for final version. Questions, comments, issues, look to associated github.
