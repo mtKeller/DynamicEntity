@@ -22,44 +22,28 @@ export interface DynamicProperties { };
  * @param rehydrate -Optional & Override to list param: rehydrate a dehydrated DynamicEntity
  */
 export class DynamicEntity implements Iterable<DynamicProperties>{
-  private _nextIndex = 0;
+  public lastIndex = 0;
   length = 0;
 
   constructor(list?: Array<any>, dehydrated?: Array<Array<(number & any)>>) { 
-    Object.defineProperty(this, '_nextIndex', {
-      enumerable: false
+    Object.defineProperty(this, 'lastIndex', {
+      enumerable: false,
+      writable: true
     })
     Object.defineProperty(this, 'length', {
-      enumerable: false
-    })
-    Object.defineProperty(this, 'dehydrate', {
-      enumerable: false
-    })
-    Object.defineProperty(this, 'append', {
-      enumerable: false
-    })
-    Object.defineProperty(this, 'map', {
-      enumerable: false
-    })
-    Object.defineProperty(this, 'filter', {
-      enumerable: false
-    })
-    Object.defineProperty(this, 'entries', {
-      enumerable: false
-    })
-    Object.defineProperty(this, 'values', {
-      enumerable: false
+      enumerable: false,
+      writable: true
     })
     if (list && !dehydrated) {
       for (let i = 0; i < list.length; i++) {
         this[i] = list[i];
-        this._nextIndex = i;
+        this.lastIndex = i;
         this.length++;
       }
     } else if (dehydrated) {
       for (let i = 0; i < dehydrated.length; i++) {
         if (dehydrated[i][0] === -1) {
-          this._nextIndex = dehydrated[i][1];
+          this.lastIndex = dehydrated[i][1];
         } else {
           this[dehydrated[i][0]] = dehydrated[i][1];
           this.length++;
@@ -77,11 +61,19 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
   */
   public dehydrate(): Array<Array<(number & any)>> {
     const dehydrationArr = [];
-    for (let props in this.entries()) {
-      dehydrationArr.push(props);
+    for (let props of this) {
+      dehydrationArr.push([props, this[Number(props)]]);
     }
-    dehydrationArr.push([-1, this._nextIndex]);
+    dehydrationArr.push([-1, this.lastIndex]);
     return dehydrationArr;
+  }
+
+  public borrow(): Array<(DynamicEntity & any)> {
+    return null;
+  }
+
+  public return(): DynamicEntity {
+    return null;
   }
 
   /**
@@ -93,8 +85,8 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
   * @param value -Required: Function each value is passed through
   */
   public append(value: any): DynamicEntity {
-    this[this._nextIndex] = value;
-    this._nextIndex++;
+    this.lastIndex++;
+    this[this.lastIndex] = value;
     const dehydrated = this.dehydrate();
     return new DynamicEntity(null, dehydrated);
   }
@@ -129,6 +121,8 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
         if (filterFunc(dehydrated[i][1])) {
           newArr.push(dehydrated[i]);
         }
+      } else {
+        newArr.push(dehydrated[i]);
       }
     }
     return new DynamicEntity(null, newArr);
@@ -142,13 +136,14 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
   public entries(): Iterator<DynamicProperties> {
     let pointer = 0;
     const keys = Object.keys(this);
+    const entity = this;
 
     return {
       next(): IteratorResult<DynamicProperties> {
         if (pointer < keys.length) {
           return {
             done: false,
-            value: [pointer, this[keys[pointer++]]]
+            value: [pointer, entity[keys[pointer++]]]
           }
         } else {
           return {
@@ -168,13 +163,14 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
   public values(): Iterator<DynamicProperties> {
     let pointer = 0;
     const keys = Object.keys(this);
+    const entity = this;
 
     return {
       next(): IteratorResult<DynamicProperties> {
         if (pointer < keys.length) {
           return {
             done: false,
-            value: this[keys[pointer++]]
+            value: entity[keys[pointer++]]
           }
         } else {
           return {
@@ -185,16 +181,24 @@ export class DynamicEntity implements Iterable<DynamicProperties>{
       }
     };
   }
+  public toString() {
+    let outStr = "";
+    for (let entry in this.entries()) {
+      outStr += entry + '\n'
+    }
+    return outStr;
+  }
   [Symbol.iterator](): Iterator<DynamicProperties> {
     let pointer = 0;
     const keys = Object.keys(this);
+    const entity = this;
 
     return {
       next(): IteratorResult<DynamicProperties> {
         if (pointer < keys.length) {
           return {
             done: false,
-            value: this[pointer++]
+            value: keys[pointer++]
           }
         } else {
           return {
