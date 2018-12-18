@@ -50,3 +50,7 @@ console.log("Outputs: ", demoEntity);
 *  '8': 246 }
 */
 ```
+
+This is to unfortunately contrast against NgRx's own Entity approach. As what this accomplish is a pure implementation of the "Entity" Pattern. As such is just an object with key value pairs.
+In this implementation a DynamicEntity is designed to be part of state, and not to replace reducers with an extra layer of abstraction to avoid boilerplate.
+With the reliance on a simple iterative index between entries is to reinforce that what this pattern enables is an abstract means of creating an address pointer in a traditional low level language. By keeping the implementation simple and Array like, it is to emphasize the use of Array of Index Structures to control logic flow. Via the removal of entries, any use of the pointer will throw an error similar to null point.
