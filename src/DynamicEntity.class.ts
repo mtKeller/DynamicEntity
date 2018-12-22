@@ -26,7 +26,7 @@ export interface DynamicProperties { };
  * @param list -Optional: generate a Dynamic Entity from a list
  * @param rehydrate -Optional & Override to list param: rehydrate a dehydrated DynamicEntity
  */
-export class DynamicEntity implements Iterable<DynamicProperties> {
+export class DynamicEntity<T> implements Iterable<DynamicProperties> {
   public lastIndex = 0;
   length = 0;
 
@@ -41,7 +41,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
     });
     if (list && !dehydrated) {
       for (let i = 0; i < list.length; i++) {
-        this[i] = list[i];
+        this[i] = list[i] as T;
         this.lastIndex = i;
         this.length++;
       }
@@ -50,7 +50,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
         if (dehydrated[i][0] === -1) {
           this.lastIndex = dehydrated[i][1];
         } else {
-          this[dehydrated[i][0]] = dehydrated[i][1];
+          this[dehydrated[i][0]] = dehydrated[i][1]  as T;
           this.length++;
         }
       }
@@ -65,7 +65,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
    * @param storeLastIndex - If set to false the dehydrated object will lose the `lastIndex` property for rehydration.
    *  * Otherwise stores the last index as `[ -1, number ]` at the end of the returned array.
    */
-  public dehydrate(storeLastIndex: boolean = true): Array<Array<(number & any)>> {
+  public dehydrate(storeLastIndex: boolean = true): Array<Array<(number & T)>> {
     const dehydrationArr = [];
     for (const props of this) {
       dehydrationArr.push([props, this[Number(props)]]);
@@ -76,14 +76,12 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
     return dehydrationArr;
   }
   /**
-   * Unique Function `Dehydrate`
-   *
-   * * Select a property to be removed and returned in conjunction with the filtered Entity
-   *
+   * Unique Function `Borrow`
+   * 
    * @param selectFunc - Must return true to match the property to be borrowed
    * @returns Array: `[ DynamicEntity, [ number, any ] ]` for deconstruction
    */
-  public borrow(selectFunc: Function): Array<(DynamicEntity & any)> {
+  public borrow(selectFunc: Function): Array<(DynamicEntity<T> & T)> {
     let borrowed;
     const dehydrated = this.dehydrate();
     const newArr = [];
@@ -99,7 +97,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
       }
     }
     borrowed = [ Number(borrowed[0]), borrowed[1] ];
-    return [ new DynamicEntity(null, newArr), borrowed ];
+    return [ new DynamicEntity<T>(null, newArr), borrowed ];
   }
   /**
    * Unique Function `Return`
@@ -109,7 +107,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
    * @param returned - Key value pair array `[ number, any ]` that is inserted into a new Entity
    * @returns The new DynamicEntity
    */
-  public return(returned: Array<(number & any)>): DynamicEntity {
+  public return(returned: Array<(number & T)>): DynamicEntity<T> {
     let dehydrated = this.dehydrate();
     dehydrated.push(returned);
     dehydrated = dehydrated.sort((a, b) => {
@@ -121,7 +119,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
       }
       return 0;
     });
-    return new DynamicEntity(null, dehydrated);
+    return new DynamicEntity<T>(null, dehydrated);
   }
 
   /**
@@ -133,7 +131,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
    * @param value -Required: Function each value is passed through
    * @returns The new DynamicEntity
    */
-  public append(value: any): DynamicEntity {
+  public append(value: T): DynamicEntity<T> {
     this.lastIndex++;
     this[this.lastIndex] = value;
     const dehydrated = this.dehydrate();
@@ -147,7 +145,7 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
    * @param mapFunc -Required: Function each value is passed through
    * @returns The new DynamicEntity
    */
-  public map(mapFunc: Function): DynamicEntity {
+  public map(mapFunc: Function): DynamicEntity<T> {
     const dehydrated = this.dehydrate();
     for (let i = 0; i < dehydrated.length; i++) {
       if (dehydrated[i][0] !== -1) {
@@ -159,24 +157,23 @@ export class DynamicEntity implements Iterable<DynamicProperties> {
   /**
    * Common Function `Filter`
    *
-   * * Returns a new DynamicEntity object that omits key values that do not pass the filterFunc
+   * * Returns a new DynamicEntity object that omits key values that pass the filterFunc
    *
    * @param filterFunc -Required: Function each value is passed through
    * @returns The new DynamicEntity
    */
-  public filter(filterFunc: Function): DynamicEntity {
+  public filter(filterFunc: Function): DynamicEntity<T> {
     const dehydrated = this.dehydrate();
     const newArr = [];
+    if (dehydrated[-1] !== undefined) {
+      newArr.push(dehydrated[-1]);
+    }
     for (let i = 0; i < dehydrated.length; i++) {
-      if (dehydrated[i][0] !== -1) {
-        if (filterFunc(dehydrated[i][1])) {
-          newArr.push(dehydrated[i]);
-        }
-      } else {
+      if (filterFunc(dehydrated[i][1])) {
         newArr.push(dehydrated[i]);
       }
     }
-    return new DynamicEntity(null, newArr);
+    return new DynamicEntity<T>(null, newArr);
   }
   /**
    * Common Function `Entries`

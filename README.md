@@ -2,14 +2,23 @@
 
 Designed to be a companion object to be used in conjunction with [ActionStrategy](https://www.npmjs.com/package/actionstrategy) or plain [NgRx](https://ngrx.io), but can also stand on it's own.
 
-DynamicEntity is a Control Data Structure that facilitates the use of Indexes as **address pointers** in Javascript.
+DynamicEntity is a D.D.A. Control Data Structure that facilitates the use of Indexes as **address pointers** in Javascript.
+
+## Updates
+5.5
+
+1. Added Generic Typing to DynamicEntity
+
+2. Adjusted Filter to reflect Array Filter Functionality. Thus if conditional function is not met, it will be added to the new DynamicEntity<T>.
+
+3. Fixed a mislabeled TypeScript Definition
 
 ## By Example
 
 ```javascript
 import { DynamicEntity } from 'dynamicentity'
 
-let demoEntity = new DynamicEntity([0,1,2,3,4,5]);
+let demoEntity = new DynamicEntity<any>([0,1,2,3,4,5]);
 
 console.log("Outputs: ", (demoEntity));
 // Outputs:  DynamicEntity { '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5 }
