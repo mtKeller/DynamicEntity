@@ -1,6 +1,7 @@
 /**
 * An Entity is an object that has any number of Key Value Pairs: ` number : value `
 */
+
 /* tslint:disable */
 export interface DynamicProperties { };
 /* tslint:enable */
@@ -57,7 +58,6 @@ export class DynamicEntity<T> implements Iterable<DynamicProperties> {
     }
   }
 
-
   /**
    * Unique Function `Dehydrate`
    *
@@ -75,9 +75,10 @@ export class DynamicEntity<T> implements Iterable<DynamicProperties> {
     }
     return dehydrationArr;
   }
+
   /**
    * Unique Function `Borrow`
-   * 
+   *
    * @param selectFunc - Must return true to match the property to be borrowed
    * @returns Array: `[ DynamicEntity, [ number, any ] ]` for deconstruction
    */
